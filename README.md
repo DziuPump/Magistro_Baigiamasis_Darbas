@@ -56,3 +56,5 @@ Atidarykite narsykleje:
 ```txt
 http://localhost:5173
 ```
+
+Duomenys, kuriais paseedintas MongoDB yra backend/duomenys aplanke
