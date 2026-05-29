@@ -56,5 +56,3 @@ Atidarykite narsykleje:
 ```txt
 http://localhost:5173
 ```
-
-Svarbu: `.env` failo nekelkite i GitHub, nes jame laikomi privatus API raktai.
