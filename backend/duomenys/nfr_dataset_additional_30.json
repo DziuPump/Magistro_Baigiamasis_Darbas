@@ -1,0 +1,512 @@
+[
+  {
+    "reqId": "NFR-SEC-031",
+    "title": "Failed Login Rate Limiting and Account Lock",
+    "context": {
+      "system": "FIN-MOB",
+      "architecture": "Microservices, gRPC, OAuth2/OIDC, local encrypted SQLite, device secure enclave",
+      "platform": "iOS (iPhone), mobile users (4G/5G)"
+    },
+    "nfrType": "Security",
+    "standard": "OWASP MASVS / PSD2 SCA",
+    "description": "Limit brute-force attempts and protect accounts during repeated authentication failures.",
+    "acceptanceCriteria": [
+      "After 5 failed login attempts within 300 seconds, the account must be locked for 900 seconds.",
+      "During lockout, all login attempts must return a lock message within 250 ms after server response is received.",
+      "Lockout counters must reset after 1800 seconds with no further failed attempts."
+    ]
+  },
+  {
+    "reqId": "NFR-PERF-032",
+    "title": "Transfer Confirmation Screen Render Time",
+    "context": {
+      "system": "FIN-MOB",
+      "architecture": "Microservices, gRPC, CDN for static assets, local encrypted SQLite cache",
+      "platform": "iOS (iPhone), mobile users (4G/5G)"
+    },
+    "nfrType": "Performance",
+    "standard": "SLA / Apple Performance Guidelines",
+    "description": "Ensure transfer confirmation UI remains responsive after user inputs and server validations.",
+    "acceptanceCriteria": [
+      "P95 time from tapping 'Continue' to fully rendered confirmation screen must be <= 1.2 seconds on 4G with 80–120 ms RTT.",
+      "Client-side validation must complete within 120 ms for inputs up to 140 characters in reference message.",
+      "Confirmation screen memory footprint must not exceed 220 MB during rendering on devices with 4 GB RAM."
+    ]
+  },
+  {
+    "reqId": "NFR-REL-033",
+    "title": "Payment Submission Idempotency and Duplicate Prevention",
+    "context": {
+      "system": "FIN-MOB",
+      "architecture": "Microservices, gRPC, idempotency keys, encrypted local draft store",
+      "platform": "iOS (iPhone), mobile users (4G/5G)"
+    },
+    "nfrType": "Reliability",
+    "standard": "SLA / Payments Reliability Guidelines",
+    "description": "Prevent duplicate payments caused by retries, network drops, or app restarts.",
+    "acceptanceCriteria": [
+      "Payment initiation must include an idempotency key and must prevent duplicate creation with >= 99.999% effectiveness.",
+      "If a retry occurs within 60 seconds, the backend must return the original payment status within 400 ms P95.",
+      "After an app restart, any pending payment draft must be recoverable within 3.0 seconds P95."
+    ]
+  },
+  {
+    "reqId": "NFR-USA-034",
+    "title": "Touch Target Size and One-Handed Usability",
+    "context": {
+      "system": "FIN-MOB",
+      "architecture": "Native iOS UI, design system components, local encrypted SQLite",
+      "platform": "iOS (iPhone), mobile users (4G/5G)"
+    },
+    "nfrType": "Usability",
+    "standard": "WCAG 2.2 AA / Apple Human Interface Guidelines",
+    "description": "Ensure primary actions are reachable and tappable with reduced user error on mobile screens.",
+    "acceptanceCriteria": [
+      "All primary action touch targets must be at least 44x44 pt and have >= 8 pt spacing to adjacent targets.",
+      "The 'Confirm' button must be reachable without scrolling on screens >= 375 px width in portrait orientation at 100% zoom.",
+      "Mis-tap rate during usability test (n>=10) must be <= 3% for primary actions (Pay/Transfer/Confirm)."
+    ]
+  },
+  {
+    "reqId": "NFR-SEC-035",
+    "title": "Secure Local Data Retention and Wipe on Logout",
+    "context": {
+      "system": "FIN-MOB",
+      "architecture": "Local encrypted SQLite, secure enclave keychain, remote logout endpoint",
+      "platform": "iOS (iPhone), mobile users (4G/5G)"
+    },
+    "nfrType": "Security",
+    "standard": "OWASP MASVS",
+    "description": "Ensure sensitive cached data is retained minimally and wiped securely when session ends.",
+    "acceptanceCriteria": [
+      "On logout, cached balances and transaction details must be wiped within 2 seconds and not recoverable via app UI.",
+      "Local encrypted database size must not exceed 50 MB for cached user data (excluding app binaries).",
+      "After remote logout, app must invalidate tokens and require re-authentication within 60 seconds."
+    ]
+  },
+  {
+    "reqId": "NFR-PERF-036",
+    "title": "Push Notification Delivery and App Wake Time",
+    "context": {
+      "system": "FIN-MOB",
+      "architecture": "Microservices, event bus, APNs push gateway, local encrypted SQLite",
+      "platform": "iOS (iPhone), mobile users (4G/5G)"
+    },
+    "nfrType": "Performance",
+    "standard": "SLA / Apple Performance Guidelines",
+    "description": "Ensure timely delivery and handling of security and payment notifications.",
+    "acceptanceCriteria": [
+      "Security alert push notification must be delivered to device within 10 seconds P95 after event creation.",
+      "From tapping a notification to displaying the relevant screen must be <= 1.8 seconds P95 on 4G.",
+      "Background fetch triggered by notification must complete within 2.5 seconds P95."
+    ]
+  },
+  {
+    "reqId": "NFR-REL-037",
+    "title": "Service Degradation Handling for Account Summary",
+    "context": {
+      "system": "FIN-MOB",
+      "architecture": "Microservices, gRPC, feature flags, circuit breakers, local cache fallback",
+      "platform": "iOS (iPhone), mobile users (4G/5G)"
+    },
+    "nfrType": "Reliability",
+    "standard": "SLA / Resilience Guidelines",
+    "description": "Provide graceful degradation when backend services are partially unavailable.",
+    "acceptanceCriteria": [
+      "If /accounts/summary fails with 5xx, app must fall back to cached data within 300 ms after failure detection.",
+      "Circuit breaker must open after 3 consecutive failures within 30 seconds and remain open for at least 60 seconds.",
+      "User must be shown an explicit 'stale data' indicator when cached data age exceeds 300 seconds."
+    ]
+  },
+  {
+    "reqId": "NFR-USA-038",
+    "title": "Error Copy Clarity for Security Blocks",
+    "context": {
+      "system": "FIN-MOB",
+      "architecture": "Native iOS UI, localization module, server-provided error codes",
+      "platform": "iOS (iPhone), mobile users (4G/5G)"
+    },
+    "nfrType": "Usability",
+    "standard": "Apple HIG / UX Writing Guidelines",
+    "description": "Ensure security-related blocks are explained clearly and actionably to users.",
+    "acceptanceCriteria": [
+      "For lockout or blocked actions, the error message must include a next-step instruction in <= 120 characters (EN).",
+      "Error screen must render within 250 ms after receiving the error response.",
+      "At least 95% of users (n>=20) must correctly identify the required next step in a comprehension test within 30 seconds."
+    ]
+  },
+  {
+    "reqId": "NFR-SEC-039",
+    "title": "Sensitive Screenshots and App Switcher Obfuscation",
+    "context": {
+      "system": "FIN-MOB",
+      "architecture": "Native iOS UI, secure screen overlays, encrypted local storage",
+      "platform": "iOS (iPhone), mobile users (4G/5G)"
+    },
+    "nfrType": "Security",
+    "standard": "OWASP MASVS / Mobile Privacy Guidelines",
+    "description": "Prevent leakage of sensitive data through screenshots or app switcher previews.",
+    "acceptanceCriteria": [
+      "When the app goes to background, the app switcher preview must be obfuscated within 200 ms.",
+      "Screenshots must be blocked or redacted on screens containing balances or full account numbers with 100% coverage.",
+      "Obfuscation must not increase foreground resume time by more than 150 ms P95."
+    ]
+  },
+  {
+    "reqId": "NFR-PERF-040",
+    "title": "Statement Download Performance and Size Limits",
+    "context": {
+      "system": "FIN-MOB",
+      "architecture": "Microservices, gRPC, document service, CDN, local encrypted storage",
+      "platform": "iOS (iPhone), mobile users (4G/5G)"
+    },
+    "nfrType": "Performance",
+    "standard": "SLA / Apple Performance Guidelines",
+    "description": "Ensure bank statement download is efficient and does not degrade app performance.",
+    "acceptanceCriteria": [
+      "Downloading a PDF statement up to 8 MB must complete within 6.0 seconds P95 on 4G (10 Mbps).",
+      "Statement viewer must open within 1.2 seconds P95 after download completes.",
+      "During download and open, app RAM usage must not exceed 280 MB."
+    ]
+  },
+  {
+    "reqId": "NFR-PERF-041",
+    "title": "Order Allocation API Throughput",
+    "context": {
+      "system": "WMS-WEB",
+      "architecture": "Web SPA + REST APIs, allocation service, PostgreSQL, Redis, async workers",
+      "platform": "Web browsers (Chrome/Edge), warehouse staff on wired/Wi-Fi"
+    },
+    "nfrType": "Performance",
+    "standard": "SLA / Capacity Targets",
+    "description": "Support fast allocation of orders to pick waves during peak load.",
+    "acceptanceCriteria": [
+      "Allocation endpoint must sustain 200 allocations/second for 30 minutes with error rate <= 0.5%.",
+      "P95 latency for POST /allocation must be <= 450 ms at 600 concurrent users.",
+      "Wave creation UI must show allocation completion status within 3.0 seconds P95."
+    ]
+  },
+  {
+    "reqId": "NFR-SEC-042",
+    "title": "Input Validation for Location and Quantity Adjustments",
+    "context": {
+      "system": "WMS-WEB",
+      "architecture": "Web SPA, REST APIs, validation service, PostgreSQL transactions",
+      "platform": "Web browsers (Chrome/Edge), warehouse staff on wired/Wi-Fi"
+    },
+    "nfrType": "Security",
+    "standard": "OWASP ASVS",
+    "description": "Prevent injection and unsafe operations in inventory adjustments.",
+    "acceptanceCriteria": [
+      "Location code must match regex ^[A-Z]{1,3}-[0-9]{1,4}-[A-Z]{1,3}$ and reject invalid input within 200 ms.",
+      "Quantity adjustments must accept integers in range -9999 to 9999; values outside must be rejected with HTTP 400 in <= 150 ms P95.",
+      "Requests containing SQL meta-characters in free-text fields (';','--','/*') must be rejected 100% of the time."
+    ]
+  },
+  {
+    "reqId": "NFR-REL-043",
+    "title": "Message Queue Backpressure and Safe Degradation",
+    "context": {
+      "system": "WMS-WEB",
+      "architecture": "REST APIs, message queue for async tasks, worker autoscaling, PostgreSQL",
+      "platform": "Web browsers (Chrome/Edge), warehouse staff on wired/Wi-Fi"
+    },
+    "nfrType": "Reliability",
+    "standard": "SLA / Resilience Guidelines",
+    "description": "Maintain system stability when asynchronous processing lags behind incoming workload.",
+    "acceptanceCriteria": [
+      "If queue depth exceeds 100,000 messages, system must enable backpressure within 60 seconds (e.g., throttle non-critical endpoints).",
+      "Under backpressure, critical workflows (pick/ship) must maintain P95 latency <= 600 ms.",
+      "Queue processing must recover to depth < 20,000 within 15 minutes after load returns to normal (<= 5,000 msg/min)."
+    ]
+  },
+  {
+    "reqId": "NFR-USA-044",
+    "title": "Usable Pagination and Filtering for Inventory Search",
+    "context": {
+      "system": "WMS-WEB",
+      "architecture": "Web SPA, REST APIs, server-side filtering, indexed search fields",
+      "platform": "Web browsers (Chrome/Edge), warehouse staff on wired/Wi-Fi"
+    },
+    "nfrType": "Usability",
+    "standard": "ISO 9241-110 / Internal UX Standards",
+    "description": "Ensure inventory search remains usable and efficient for warehouse users.",
+    "acceptanceCriteria": [
+      "Changing a filter must update results within 800 ms P95 for result sets up to 50,000 items.",
+      "Pagination must support page sizes 25/50/100; switching page size must complete within 900 ms P95.",
+      "Search field must accept 1–64 characters and show validation errors within 150 ms for longer inputs."
+    ]
+  },
+  {
+    "reqId": "NFR-SEC-045",
+    "title": "CSRF Protection and SameSite Cookies",
+    "context": {
+      "system": "WMS-WEB",
+      "architecture": "Web SPA, REST APIs, session cookies, CSRF tokens, reverse proxy",
+      "platform": "Web browsers (Chrome/Edge), warehouse staff on wired/Wi-Fi"
+    },
+    "nfrType": "Security",
+    "standard": "OWASP ASVS",
+    "description": "Protect session-based operations from CSRF and session fixation risks.",
+    "acceptanceCriteria": [
+      "All state-changing requests must require a valid CSRF token and reject missing/invalid tokens with HTTP 403 in <= 150 ms.",
+      "Session cookies must use SameSite=Lax or Strict and must be flagged Secure and HttpOnly (100% coverage).",
+      "Session identifier must rotate within 2 seconds after privilege elevation (e.g., role change)."
+    ]
+  },
+  {
+    "reqId": "NFR-PERF-046",
+    "title": "Label Printing Response Time",
+    "context": {
+      "system": "WMS-WEB",
+      "architecture": "Web SPA, REST print service, printer gateway, job queue",
+      "platform": "Web browsers (Chrome/Edge), warehouse staff on wired/Wi-Fi"
+    },
+    "nfrType": "Performance",
+    "standard": "SLA / Operational Performance Targets",
+    "description": "Ensure label print requests are processed quickly to avoid line stoppage.",
+    "acceptanceCriteria": [
+      "P95 time from clicking 'Print' to job accepted by print queue must be <= 500 ms.",
+      "For a batch of 200 labels, job creation must complete within 4.0 seconds P95.",
+      "Print service must handle 50 concurrent print requests with error rate <= 1% over 15 minutes."
+    ]
+  },
+  {
+    "reqId": "NFR-REL-047",
+    "title": "Database Failover Transparency for Read Operations",
+    "context": {
+      "system": "WMS-WEB",
+      "architecture": "PostgreSQL replication, read replicas, connection pooling, retry policies",
+      "platform": "Web browsers (Chrome/Edge), warehouse staff on wired/Wi-Fi"
+    },
+    "nfrType": "Reliability",
+    "standard": "SLA / Business Continuity Plan",
+    "description": "Ensure read operations remain available during database failover events.",
+    "acceptanceCriteria": [
+      "During read-replica failover, inventory read endpoints must maintain availability >= 99.9% per month.",
+      "Client-visible errors during failover must be <= 0.5% of requests over a 10-minute failover window.",
+      "Automatic retry for transient DB errors must complete within 2 retries and total additional delay <= 800 ms."
+    ]
+  },
+  {
+    "reqId": "NFR-USA-048",
+    "title": "Form Validation Feedback Timing for Shipping",
+    "context": {
+      "system": "WMS-WEB",
+      "architecture": "Web SPA, REST APIs, client-side + server-side validation",
+      "platform": "Web browsers (Chrome/Edge), warehouse staff on wired/Wi-Fi"
+    },
+    "nfrType": "Usability",
+    "standard": "ISO 9241-110 / UX Writing Guidelines",
+    "description": "Provide fast, precise validation feedback to reduce shipping errors.",
+    "acceptanceCriteria": [
+      "Client-side validation messages must display within 120 ms after input blur.",
+      "Server-side validation errors must render in UI within 300 ms after response receipt.",
+      "Address line fields must accept 1–60 characters; values > 60 must be rejected and highlighted with 100% field-level accuracy."
+    ]
+  },
+  {
+    "reqId": "NFR-SEC-049",
+    "title": "Audit Log Integrity and Retention",
+    "context": {
+      "system": "WMS-WEB",
+      "architecture": "Append-only audit log, immutable storage tier, centralized logging",
+      "platform": "Web browsers (Chrome/Edge), warehouse staff on wired/Wi-Fi"
+    },
+    "nfrType": "Security",
+    "standard": "ISO 27001 Controls / Internal Audit Policy",
+    "description": "Ensure audit logs are tamper-evident, complete, and retained for investigations.",
+    "acceptanceCriteria": [
+      "Audit events for pick/pack/ship must be written within 1 second P95 of transaction commit for 99.9% of events.",
+      "Audit log retention must be >= 730 days and retrieval for a 7-day window must complete within 3.0 seconds for up to 200,000 events.",
+      "Any attempt to delete or alter audit records must be denied 100% of the time and logged within 500 ms."
+    ]
+  },
+  {
+    "reqId": "NFR-PERF-050",
+    "title": "Concurrent RF Scanner Sessions Performance",
+    "context": {
+      "system": "WMS-WEB",
+      "architecture": "Web SPA, REST APIs, session store, Redis cache, autoscaling app tier",
+      "platform": "Rugged browser terminals (Chrome), RF scanners on Wi-Fi, warehouse staff"
+    },
+    "nfrType": "Performance",
+    "standard": "SLA / Capacity Targets",
+    "description": "Maintain responsiveness for scanner-driven workflows during high concurrency.",
+    "acceptanceCriteria": [
+      "System must support 800 concurrent scanner sessions with P95 latency <= 400 ms for scan submit endpoint.",
+      "Session store operations must complete within 30 ms P95 at 2,000 ops/second.",
+      "Overall error rate must remain <= 1.0% during 45 minutes of sustained peak scanning."
+    ]
+  },
+  {
+    "reqId": "NFR-REL-051",
+    "title": "High Availability for Alerting Service",
+    "context": {
+      "system": "MED-IOT",
+      "architecture": "Rules engine, alerting microservice, multi-zone deployment, message queue",
+      "platform": "Medical monitoring devices over Wi-Fi/LTE, clinician web console"
+    },
+    "nfrType": "Reliability",
+    "standard": "Medical Service SLA / Business Continuity Plan",
+    "description": "Ensure alerting remains available and timely during component failures.",
+    "acceptanceCriteria": [
+      "Alerting service monthly availability must be >= 99.95%.",
+      "During single-zone failure, critical alert generation latency must remain <= 5.0 seconds P95.",
+      "Failed alert deliveries must be retried up to 5 times within 300 seconds with backoff starting at 5 seconds."
+    ]
+  },
+  {
+    "reqId": "NFR-SEC-052",
+    "title": "Secure Firmware Update Delivery",
+    "context": {
+      "system": "MED-IOT",
+      "architecture": "IoT devices, signed firmware packages, update service, secure boot",
+      "platform": "Battery-powered medical devices, intermittent Wi-Fi/LTE"
+    },
+    "nfrType": "Security",
+    "standard": "IEC 62304 / NIST IoT Guidance",
+    "description": "Ensure firmware updates are authenticated, integrity-checked, and safely applied.",
+    "acceptanceCriteria": [
+      "Firmware packages must be signed and signature verification must succeed before install in 100% of cases.",
+      "Device must reject unsigned or tampered firmware within 2 seconds of verification start.",
+      "Firmware update download must support resume and must complete within 20 minutes for packages up to 50 MB on 10 Mbps connection."
+    ]
+  },
+  {
+    "reqId": "NFR-PERF-053",
+    "title": "Clinician Alert Inbox Load Time",
+    "context": {
+      "system": "MED-IOT",
+      "architecture": "Clinician web console, alert store, indexed queries, CDN",
+      "platform": "Clinician desktop web"
+    },
+    "nfrType": "Performance",
+    "standard": "SLA / Clinical Monitoring Targets",
+    "description": "Keep alert triage workflow responsive under large alert volumes.",
+    "acceptanceCriteria": [
+      "Alert inbox must load and become interactive within 2.0 seconds P95 for up to 5,000 alerts.",
+      "Filtering by severity must return results within 900 ms P95.",
+      "Opening a single alert detail view must complete within 700 ms P95."
+    ]
+  },
+  {
+    "reqId": "NFR-USA-054",
+    "title": "Alarm Sound/Visual Distinction and Accessibility",
+    "context": {
+      "system": "MED-IOT",
+      "architecture": "Alerting service, clinician console UI, notification settings",
+      "platform": "Clinician desktop and tablet web"
+    },
+    "nfrType": "Usability",
+    "standard": "IEC 62366-1 / WCAG 2.2 AA",
+    "description": "Ensure alarms are distinguishable and accessible for clinicians in high-stress environments.",
+    "acceptanceCriteria": [
+      "Critical vs non-critical alarms must be distinguishable without color alone, achieving text/icon contrast ratio >= 4.5:1.",
+      "Alarm acknowledgement control must be reachable via keyboard in <= 6 tab stops.",
+      "Notification settings changes must apply within 30 seconds and be persisted with 100% success rate."
+    ]
+  },
+  {
+    "reqId": "NFR-SEC-055",
+    "title": "Least-Privilege Access to Patient Streams",
+    "context": {
+      "system": "MED-IOT",
+      "architecture": "RBAC/ABAC authorization, audit logging, time-series DB",
+      "platform": "Clinician web console"
+    },
+    "nfrType": "Security",
+    "standard": "HIPAA Security Rule (best practice) / ISO 27001",
+    "description": "Ensure clinicians only access patient data they are authorized to view.",
+    "acceptanceCriteria": [
+      "Unauthorized patient stream access must return HTTP 403 within 200 ms P95.",
+      "Policy decision evaluation must complete within 30 ms P95 at 1,000 authorization checks/second.",
+      "All PHI access attempts (allowed or denied) must be audit-logged within 1 second P95."
+    ]
+  },
+  {
+    "reqId": "NFR-REL-056",
+    "title": "Clock Drift Handling for Time-Series Accuracy",
+    "context": {
+      "system": "MED-IOT",
+      "architecture": "IoT devices, NTP sync, ingestion normalization, time-series DB",
+      "platform": "Medical monitoring devices over Wi-Fi/LTE"
+    },
+    "nfrType": "Reliability",
+    "standard": "SLA / Clinical Data Integrity Guidelines",
+    "description": "Maintain accurate timestamping and ordering of telemetry despite device clock drift.",
+    "acceptanceCriteria": [
+      "Device clock drift beyond ±5 seconds must be detected within 2 minutes of ingestion.",
+      "Server-side normalization must correct ordering for drift up to ±30 seconds with 99.9% success rate.",
+      "If drift exceeds ±30 seconds, system must flag the stream and notify within 60 seconds."
+    ]
+  },
+  {
+    "reqId": "NFR-PERF-057",
+    "title": "Rules Engine Evaluation Throughput",
+    "context": {
+      "system": "MED-IOT",
+      "architecture": "Stream processing, rules engine, autoscaling compute, message queue",
+      "platform": "Medical monitoring devices over Wi-Fi/LTE, clinician web console"
+    },
+    "nfrType": "Performance",
+    "standard": "SLA / Capacity Targets",
+    "description": "Sustain continuous rules evaluation for large device fleets without lag.",
+    "acceptanceCriteria": [
+      "Rules engine must sustain 25,000 messages/second with P95 evaluation latency <= 120 ms per message.",
+      "Scaling event must add capacity within 3 minutes when CPU exceeds 70% for 120 seconds.",
+      "Under peak load, critical rule miss rate must be <= 0.1% (missed threshold breaches)."
+    ]
+  },
+  {
+    "reqId": "NFR-USA-058",
+    "title": "Clinician Workflow Efficiency for Patient Assignment",
+    "context": {
+      "system": "MED-IOT",
+      "architecture": "Clinician web console, patient directory, RBAC, audit logging",
+      "platform": "Clinician desktop web"
+    },
+    "nfrType": "Usability",
+    "standard": "IEC 62366-1 Usability Engineering",
+    "description": "Enable fast, low-error assignment of patients to clinician teams.",
+    "acceptanceCriteria": [
+      "Searching for a patient by identifier must return results within 800 ms P95 for up to 200,000 patients.",
+      "Assign/unassign action must complete within 1.0 second P95 and show confirmation within 200 ms after response receipt.",
+      "In usability testing (n>=10), median time to assign 5 patients must be <= 60 seconds with <= 1 error per user."
+    ]
+  },
+  {
+    "reqId": "NFR-SEC-059",
+    "title": "Telemetry Payload Size and Field Whitelisting",
+    "context": {
+      "system": "MED-IOT",
+      "architecture": "MQTT ingestion, schema validation, field whitelist, anomaly detection",
+      "platform": "IoT devices over Wi-Fi/LTE"
+    },
+    "nfrType": "Security",
+    "standard": "IEC 62304 / OWASP ASVS",
+    "description": "Prevent malformed or oversized telemetry from impacting availability and data quality.",
+    "acceptanceCriteria": [
+      "Telemetry payload must not exceed 32 KB; larger payloads must be rejected within 100 ms P95.",
+      "Only whitelisted fields must be accepted; unknown fields must be dropped with >= 99.99% accuracy and logged within 1 second.",
+      "Schema validation must complete within 15 ms P95 at 10,000 messages/second."
+    ]
+  },
+  {
+    "reqId": "NFR-REL-060",
+    "title": "End-to-End Telemetry Completeness SLO",
+    "context": {
+      "system": "MED-IOT",
+      "architecture": "IoT devices, MQTT broker, ingestion, time-series DB, monitoring",
+      "platform": "Medical monitoring devices over Wi-Fi/LTE, clinician web console"
+    },
+    "nfrType": "Reliability",
+    "standard": "SLO / Clinical Monitoring Targets",
+    "description": "Ensure the system consistently captures and persists incoming telemetry with minimal loss.",
+    "acceptanceCriteria": [
+      "End-to-end telemetry persistence success rate must be >= 99.7% per 24-hour window.",
+      "For any 5-minute window, missing telemetry points must not exceed 0.5% per device at normal sampling rate.",
+      "If persistence success rate drops below 99.5% for 10 consecutive minutes, an incident alert must trigger within 60 seconds."
+    ]
+  }
+]
